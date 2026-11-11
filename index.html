@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>카메라로 말하는 AI 영상</title>
+<meta name="description" content="프롬프트로 카메라를 연출하는 기법 21종과 프레임 사이즈 9종, 예시 영상과 복사해 쓰는 CAMERA 블록">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Noto+Sans+KR:wght@400;600;700&family=Noto+Serif+KR:wght@700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#14130F;--panel:#1F1D18;--panel2:#262420;--line:#3A372F;--dash:#5C5649;--fg:#F3EFE6;--body:#C9C2B3;--muted:#8A8475;--amber:#E9A23B;--warn:#E8826B;--good:#9BC48A}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:64px}
+body{margin:0;background:var(--bg);color:var(--body);font:17px/1.7 'Noto Sans KR',system-ui,sans-serif;-webkit-text-size-adjust:100%}
+.mono{font-family:'JetBrains Mono','Courier New',monospace}
+h1,h2,h3,h4{color:var(--fg);margin:0;line-height:1.25}
+b{color:var(--fg)}a{color:var(--amber)}
+mark{background:none;color:var(--amber);font-weight:700}
+nav{position:sticky;top:0;z-index:10;background:rgba(20,19,15,.94);backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
+nav .in{max-width:1120px;margin:0 auto;display:flex;gap:4px;overflow-x:auto;padding:10px 16px;scrollbar-width:none}
+nav .in::-webkit-scrollbar{display:none}
+nav a{flex:none;color:var(--body);text-decoration:none;font-size:14px;padding:6px 12px;border-radius:999px;border:1px solid var(--line)}
+nav a:hover,nav a.on{color:var(--bg);background:var(--amber);border-color:var(--amber)}
+main{max-width:1120px;margin:0 auto;padding:0 16px 80px}
+.hero{padding:72px 0 48px;border-bottom:1px solid var(--line)}
+.rec{font:600 13px/1 'JetBrains Mono',monospace;letter-spacing:2px;color:var(--muted);display:flex;align-items:center;gap:10px;margin:0 0 28px}
+.rec span{width:12px;height:12px;border-radius:50%;background:var(--warn);animation:blink 1.6s infinite}
+@keyframes blink{50%{opacity:.25}}
+.hero h1{font:700 clamp(40px,8vw,84px)/1.1 'Noto Serif KR',Georgia,serif}
+.lead{font-size:clamp(17px,2.4vw,21px);margin:24px 0 16px;max-width:720px}
+.src{font-size:14px;color:var(--muted)}
+.block{padding:40px 0;border-bottom:1px solid var(--line)}
+.sec{font:700 clamp(26px,4vw,36px)/1.3 'Noto Serif KR',serif;margin-bottom:20px}
+.sub{font-size:clamp(20px,3vw,24px);margin-bottom:18px}
+.goals{padding-left:1.4em;margin:0}.goals li{margin:8px 0}
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:24px 0}
+.duo>div{background:var(--panel);padding:20px 24px}.duo .media{margin-top:14px}.small{margin:0;font-size:15px}
+.big{margin:0;font:700 40px/1.2 'Noto Serif KR',serif;color:var(--amber)}
+.axes{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin:8px 0 20px}
+.axes>div{background:var(--panel);padding:18px}.axes p{margin:4px 0;font-size:15px}
+.k{font-size:12px!important;letter-spacing:2px;color:var(--amber);margin:0 0 6px!important}
+.axes .n{font:700 22px 'JetBrains Mono',monospace;color:var(--fg);margin-top:10px}
+.part{padding:72px 0 24px}
+.pno{font:600 14px 'JetBrains Mono',monospace;letter-spacing:3px;color:var(--amber);margin:0 0 8px}
+.part h2{font:700 clamp(32px,5vw,48px)/1.2 'Noto Serif KR',serif}
+.psub{color:var(--muted);margin:8px 0 0}
+.blocks{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.blocks>div{background:var(--panel);padding:20px 22px}.b-cam{border:2px solid var(--amber)}
+.ex{color:var(--fg);font-size:15px;margin:12px 0 0}
+.four-steps{list-style:none;counter-reset:s;padding:0;margin:0 0 16px;display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.four-steps li{counter-increment:s;background:var(--panel);padding:16px}
+.four-steps li::before{content:counter(s);display:block;font:700 28px 'JetBrains Mono',monospace;color:var(--amber)}
+.four-steps b{display:block}
+.code{background:var(--panel);padding:16px 20px;color:var(--fg);font-size:14px;overflow-x:auto;margin:0}
+.note{font-size:15px;color:var(--muted)}
+.scene{background:var(--panel);padding:12px 16px;margin-top:10px}
+.scene span,.cam-h span{font:600 12px 'JetBrains Mono',monospace;letter-spacing:2px;color:var(--muted)}
+.scene p{margin:4px 0 0;font-size:14px;line-height:1.55}
+.cam{background:var(--panel);border:2px solid var(--amber);padding:12px 16px;margin:14px 0}
+.cam-h{display:flex;justify-content:space-between;align-items:center;gap:8px}.cam-h span{color:var(--amber)}
+.cam p{margin:6px 0 0;color:var(--fg);font-size:15px;line-height:1.55}
+.copy{font:600 12px 'Noto Sans KR',sans-serif;color:var(--bg);background:var(--amber);border:0;border-radius:4px;padding:4px 10px;cursor:pointer;flex:none}
+.copy.done{background:var(--good)}
+figure{margin:0}
+.media video,.media img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover;background:#0B0A08}
+.media.sq video{object-fit:contain}
+.diag{margin-top:10px}.diag img{display:block;width:100%;height:auto;background:var(--panel)}
+.diag-note{border-left:3px solid var(--amber);padding:6px 12px;margin:0 0 8px}
+figcaption{font:12px 'JetBrains Mono',monospace;color:var(--muted);padding:6px 0 0}
+.swap{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:14px 0}
+.swap-t{margin:8px 0 0}
+.swap .cam{margin:8px 0 0}
+.rules{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.rules>div{background:var(--panel);padding:20px}.rules h4{font-size:20px;margin-bottom:6px}
+.bad,.good{font-size:14px;margin:6px 0;padding:6px 10px;background:var(--panel2)}
+.bad{color:var(--warn)}.good{color:var(--good)}
+.tech{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:28px;padding:36px 0;border-bottom:1px solid var(--line)}
+.kicker{font:600 13px 'JetBrains Mono',monospace;letter-spacing:2px;color:var(--amber);margin:0 0 4px}
+.tech h3{font:700 clamp(26px,3.6vw,34px)/1.25 'Noto Serif KR',serif}
+.en{font-size:.6em;color:var(--muted);font-family:'Noto Sans KR',sans-serif;font-weight:400}
+.mu{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;margin:14px 0 0}
+.mu dt{color:var(--amber);font-size:15px}.mu dd{margin:0}
+.four{background:var(--panel);padding:10px 16px}
+.four summary{cursor:pointer;font-size:14px;color:var(--fg)}
+.four ul{list-style:none;padding:0;margin:8px 0 4px;font-size:13.5px;line-height:1.6}
+.four li{margin:4px 0}.four b{color:var(--fg)}
+.fail{margin-top:16px;border:2px solid var(--warn);padding:14px 18px;background:var(--panel)}
+.fail .k{color:var(--warn)}.fail p{margin:8px 0;font-size:15.5px}.fail em{color:var(--warn);font-style:normal;font-weight:700}
+.fail .mono{font-size:13.5px;color:var(--fg)}.q{color:var(--amber)}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.still{display:flex;flex-direction:column}.still .kicker{margin-top:12px}
+.still h4{font:700 22px/1.3 'Noto Serif KR',serif}
+.still .cam{border-width:1px;margin-top:12px}.still .cam p{font-size:13px}
+.quote{font:700 clamp(22px,3vw,28px)/1.4 'Noto Serif KR',serif;color:var(--fg);text-align:center;margin:36px 0 8px}
+.tw{overflow-x:auto;margin:0 0 16px}
+table{border-collapse:collapse;width:100%;font-size:15.5px}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+thead th{color:var(--amber);font-size:14px;font-weight:600;border-bottom:2px solid var(--dash)}
+tbody th{color:var(--fg);font-weight:600;white-space:nowrap}
+.cards td.mono{color:var(--fg);font-size:14px}.cards td:last-child{width:1%}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.chip{background:var(--panel);color:var(--body);border:1px solid var(--dash);font-weight:400;font-size:14px;padding:8px 12px}
+.chip .mono{color:var(--fg)}.chip.done{border-color:var(--good);background:var(--panel)}
+.sheet{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px;align-items:start}
+.sheet .media img{aspect-ratio:1/1;object-fit:contain}
+.three{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+.three>div{background:var(--panel);padding:18px}.three h4{font-size:18px;margin-bottom:6px}.three p{margin:0;font-size:15px}
+.flow{list-style:none;counter-reset:f;padding:0;margin:0 0 16px;display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.flow li{counter-increment:f;background:var(--panel);padding:16px}
+.flow li::before{content:counter(f);display:block;font:700 26px 'JetBrains Mono',monospace;color:var(--amber)}
+.flow b{display:block}.flow span{font-size:14px}
+.summary{margin:56px 0;padding:40px 32px;background:var(--panel);border-left:4px solid var(--amber)}
+.big2{font:700 clamp(26px,4.4vw,42px)/1.35 'Noto Serif KR',serif;color:var(--fg);margin:8px 0 20px}
+.foot{padding:40px 0 0;font-size:15px}.foot p{margin:10px 0}
+.top{position:fixed;right:16px;bottom:16px;width:44px;height:44px;border-radius:50%;background:var(--amber);color:var(--bg);border:0;font-size:20px;cursor:pointer;opacity:0;pointer-events:none;transition:opacity .2s}
+.top.show{opacity:1;pointer-events:auto}
+@media (max-width:860px){
+ .tech,.sheet{grid-template-columns:1fr;gap:16px}
+ .axes{grid-template-columns:repeat(2,1fr)}.flow{grid-template-columns:repeat(2,1fr)}
+ .swap,.grid3{grid-template-columns:1fr 1fr}
+ .three,.rules,.blocks{grid-template-columns:1fr}
+ .four-steps{grid-template-columns:1fr 1fr}
+}
+@media (max-width:560px){
+ body{font-size:16px}
+ .swap,.grid3,.pair,.duo{grid-template-columns:1fr}
+ .axes{grid-template-columns:1fr 1fr}
+ .summary{padding:28px 20px}
+}
+</style></head>
+<body><nav><div class="in"><a href="#p1">쓰는 법</a><a href="#p2">움직임</a><a href="#p3">운용</a><a href="#p4">앵글·위치</a><a href="#p5">렌즈</a><a href="#p6">사이즈</a><a href="#p7">워크플로</a><a href="#cards">카메라 카드</a></div></nav>
+<main><header class="hero">
+<p class="rec"><span></span>REC · 생성형 AI를 활용한 문제해결 프로그래밍</p>
+<h1>카메라로 말하는<br>AI 영상</h1>
+<p class="lead">움직임 · 운용 · 앵글 · 렌즈 · 사이즈.<br>프롬프트로 카메라를 연출하는 기법 21종과 프레임 사이즈 9종을 예시 영상과 함께 정리했습니다.</p>
+<p class="src">내용 출처: AI 아스트라, 「AI 영화 제작 가이드」 (YouTube, 2026) · 예시는 Higgsfield로 직접 생성</p>
+</header><section class="block" id="goals"><h2 class="sec">오늘의 목표</h2>
+<ol class="goals">
+<li>카메라 결정을 <b>움직임 · 운용 · 앵글 · 렌즈 · 사이즈</b>로 나눠 설명할 수 있다.</li>
+<li>기법 21종과 프레임 사이즈 9종을 장면의 목적에 맞게 고를 수 있다.</li>
+<li><b>SCENE</b>과 <b>CAMERA</b> 블록을 나눠 쓰고, 카메라만 바꿔 같은 장면을 다르게 찍을 수 있다.</li>
+</ol></section><section class="block" id="why"><h2 class="sec">AI 영상이 밋밋한 이유는 대부분 카메라</h2>
+<p>화질도 좋고 인물도 잘 나왔는데 영화 같지 않다면, 카메라가 가만히 있거나 천천히 앞으로 들어가기만 했기 때문입니다.</p>
+<div class="duo"><div><p class="big">각성</p><p class="small">카메라가 인물을 향해 밀고 들어가면</p><figure class="media"><video controls preload="none" playsinline poster="media/W01.jpg" aria-label="W01 각성: 골목에 선 여성에게 카메라가 다가가 얼굴 클로즈업에서 멈춤"><source src="media/W01.mp4" type="video/mp4"></video><figcaption>W01 · 영상 (재생 버튼을 누르세요)</figcaption></figure></div>
+<div><p class="big">상실</p><p class="small">카메라가 인물에게서 물러나면</p><figure class="media"><video controls preload="none" playsinline poster="media/W02.jpg" aria-label="W02 상실: 같은 여성의 얼굴에서 카메라가 물러나 좁은 골목 속 작은 인물이 됨"><source src="media/W02.mp4" type="video/mp4"></video><figcaption>W02 · 영상 (재생 버튼을 누르세요)</figcaption></figure></div></div>
+<p>같은 인물, 같은 장소, 같은 표정. 대사 한 줄 없이 <b>카메라만으로 감정이 바뀝니다.</b></p></section><section class="block" id="axes"><h2 class="sec">카메라 결정은 다섯 가지로 나눈다</h2>
+<div class="axes">
+<div><p class="mono k">MOVE</p><h4>움직임</h4><p>카메라가 어떻게 이동하나</p><p class="n">9종</p></div>
+<div><p class="mono k">SUPPORT</p><h4>운용 방식</h4><p>카메라를 어떻게 들고 있나</p><p class="n">3종</p></div>
+<div><p class="mono k">ANGLE</p><h4>앵글과 위치</h4><p>어디서, 어떤 높이로 보나</p><p class="n">6종</p></div>
+<div><p class="mono k">LENS</p><h4>렌즈와 초점</h4><p>크기와 선명도를 어떻게 바꾸나</p><p class="n">3종</p></div>
+<div><p class="mono k">SIZE</p><h4>사이즈</h4><p>인물을 어디서 자르나</p><p class="n">9종</p></div>
+</div>
+<p>다섯 가지는 서로 독립적입니다. 하나씩 따로 정할수록 프롬프트가 정확해지고, 여기에 <b>컷 길이</b>를 더하면 한 컷의 설계가 끝납니다.</p></section><header class="part" id="p1"><p class="pno">PART 01</p><h2>카메라 프롬프트 쓰는 법</h2><p class="psub">SCENE과 CAMERA, 두 블록으로 쓰기</p></header><section class="block"><h3 class="sub">프롬프트는 두 블록으로 쓴다</h3>
+<div class="blocks">
+<div class="b-scene"><p class="mono k">SCENE · 무엇이 일어나나</p><p>인물 · 장소 · 행동 · 빛. <b>한 번 쓰고 그대로 둔다.</b></p>
+<p class="mono ex">She studies the photo, then slowly raises her eyes as she realizes something.</p></div>
+<div class="b-cam"><p class="mono k">CAMERA · 어떻게 찍나</p><p>움직임 · 운용 · 앵글 · 렌즈 · 사이즈. <b>카드처럼 갈아 끼운다.</b></p>
+<p class="mono ex">Slow dolly in toward her face, ending on a close-up.</p></div>
+</div>
+<p>CAMERA 블록은 한 문장이면 충분합니다. 결과가 원하는 대로 안 나올 때만 아래 네 요소로 자세히 씁니다.</p></section><section class="block"><h3 class="sub">결과가 어긋나면: CAMERA 블록 체크리스트 4요소</h3>
+<ol class="four-steps">
+<li><b>무브먼트</b> 무엇을 하나</li><li><b>스피드</b> 얼마나 빠르게</li>
+<li><b>프레이밍</b> 움직이는 동안 무엇을 유지하나</li><li><b>엔드</b> 어디서 멈추나</li></ol>
+<p class="note">가장 많이 빠뜨리는 것이 <b>엔드</b>입니다. 끝을 정하지 않으면 마지막 1초가 어정쩡하게 흘러갑니다.</p>
+<pre class="mono code">Movement: dolly in (the camera moves, not a zoom)
+Speed:    slow and steady
+Framing:  face centered at eye level
+End:      stop on a close-up</pre></section><section class="block" id="swap"><h3 class="sub">같은 장면, CAMERA 블록만 바꾸면</h3>
+<div class="scene"><span>SCENE · 고정</span><p class="mono">She studies the photo, then slowly raises her eyes as she realizes something.</p></div>
+<div class="swap"><div class="swap-c"><figure class="media"><video controls preload="none" playsinline poster="media/M01.jpg" aria-label="달리 인: 골목에서 사진을 보던 여성에게 카메라가 다가감"><source src="media/M01.mp4" type="video/mp4"></video><figcaption>M01 · 영상 (재생 버튼을 누르세요)</figcaption></figure><p class="swap-t"><b>달리 인</b> → 깨달음</p><div class="cam"><div class="cam-h"><span>CAMERA</span><button class="copy" data-copy="Slow dolly in toward her face, ending on a close-up.">복사</button></div><p class="mono">Slow dolly in toward her face, ending on a close-up.</p></div></div><div class="swap-c"><figure class="media"><video controls preload="none" playsinline poster="media/D02.jpg" aria-label="크레인 업: 카메라가 위로 올라가며 좁은 골목 속 여성이 작아짐"><source src="media/D02.mp4" type="video/mp4"></video><figcaption>D02 · 영상 (재생 버튼을 누르세요)</figcaption></figure><p class="swap-t"><b>크레인 업</b> → 고립, 여운</p><div class="cam"><div class="cam-h"><span>CAMERA</span><button class="copy" data-copy="Crane straight up until she is small in the alley.">복사</button></div><p class="mono">Crane straight up until she is small in the alley.</p></div></div><div class="swap-c"><figure class="media"><video controls preload="none" playsinline poster="media/D03.jpg" aria-label="핸드헬드: 흔들리는 클로즈업 속에서 여성이 사진을 보다 눈을 들어 올림"><source src="media/D03.mp4" type="video/mp4"></video><figcaption>D03 · 영상 (재생 버튼을 누르세요)</figcaption></figure><p class="swap-t"><b>핸드헬드</b> → 불안, 긴장</p><div class="cam"><div class="cam-h"><span>CAMERA</span><button class="copy" data-copy="Handheld, small nervous shakes, staying close on her face.">복사</button></div><p class="mono">Handheld, small nervous shakes, staying close on her face.</p></div></div></div>
+<p>세 영상은 같은 캐릭터 시트, 같은 SCENE, 같은 길이(7초)로 만들었고 <b>CAMERA 블록만 다릅니다.</b> 차례로 재생해 보고 각각 어떤 감정이 드는지 비교해 보세요.</p></section><section class="block"><h3 class="sub">CAMERA 블록의 두 가지 규칙</h3>
+<div class="rules">
+<div><p class="mono k">RULE 1</p><h4>움직임은 하나만</h4><p>여러 움직임을 섞으면 카메라가 갈 곳을 몰라 어정쩡하게 떨기만 합니다. 필요하면 컷을 나눕니다.</p>
+<p class="bad mono">나쁨 · 돌면서 + 줌 인 + 위로 상승</p><p class="good mono">좋음 · 천천히 달리 인, 클로즈업에서 멈춤</p></div>
+<div><p class="mono k">RULE 2</p><h4>장비 대신 결과를 쓴다</h4><p>장비 이름을 쓰면 장면 속 소품으로 등장할 수 있습니다. 아래 M02 예시에서는 삼각대가 화면에 나왔습니다.</p>
+<p class="bad mono">나쁨 · locked on a tripod</p><p class="good mono">좋음 · the camera does not move</p></div>
+</div></section><header class="part" id="p2"><p class="pno">PART 02</p><h2>카메라 움직임 9종</h2><p class="psub">카메라가 어떻게 이동하나</p></header><p class="note diag-note">각 기법의 영상 아래 그림은 카메라가 어떻게 움직이는지 위(TOP VIEW) 또는 옆(SIDE VIEW)에서 본 것입니다. 그림 속 장비(레일, 달리, 크레인, 드론, 짐벌)는 실제 촬영에서 그 움직임을 만드는 방법이고, 프롬프트에는 장비 이름 대신 움직임의 결과를 씁니다(규칙 2).</p><article class="tech" id="m01">
+<div class="tech-media"><figure class="media"><video controls preload="none" playsinline poster="media/M01.jpg" aria-label="달리 인 예시 영상: 골목에서 사진을 보던 여성에게 카메라가 다가가 얼굴 클로즈업에서 멈춤"><source src="media/M01.mp4" type="video/mp4"></video><figcaption>M01 · 영상 (재생 버튼을 누르세요)</figcaption></figure><figure class="diag"><img src="media/diag_M01.png" alt="M01 카메라 움직임 그림" loading="lazy"></figure><div class="scene"><span>SCENE · 고정</span><p class="mono">She studies the photo, then slowly raises her eyes as she realizes something.</p></div></div>
+<div class="tech-body">
+<p class="kicker">M01</p><h3>달리 인 <span class="en">Dolly In</span></h3>
+<dl class="mu"><dt>동작</dt><dd>카메라 자체가 인물 쪽으로 이동</dd><dt>용도</dt><dd>깨닫는 순간, 각성</dd></dl>
+<div class="cam"><div class="cam-h"><span>CAMERA · 교체 가능</span><button class="copy" data-copy="Slow dolly in toward her face, ending on a close-up.">복사</button></div><p class="mono">Slow dolly in toward her face, ending on a close-up.</p></div><details class="four"><summary>실제 생성에 쓴 4요소 · 7초</summary><ul class="mono"><li><b>Movement:</b> <mark>dolly in</mark>, the camera itself moves forward toward her face <mark>(not a zoom)</mark></li><li><b>Speed:</b> slow and steady</li><li><b>Framing:</b> face centered; the alley walls pass by with <mark>natural parallax</mark></li><li><b>End:</b> <mark>stop on a close-up</mark> of her face</li></ul></details>
+</div></article><article class="tech" id="m10">
+<div class="tech-media"><figure class="media"><video controls preload="none" playsinline poster="media/M10.jpg" aria-label="푸시 스루 예시 영상: 카메라가 바닷가 카페의 창문을 통과해 창가 자리의 여성에게 다가감"><source src="media/M10.mp4" type="video/mp4"></video><figcaption>M10 · 영상 (재생 버튼을 누르세요)</figcaption></figure><figure class="diag"><img src="media/diag_M10.png" alt="M10 카메라 움직임 그림" loading="lazy"></figure><div class="scene"><span>SCENE · 고정</span><p class="mono">A person in a yellow raincoat sits at the window table and turns a page of a photo album.</p></div></div>
+<div class="tech-body">
+<p class="kicker">M10</p><h3>푸시 스루 <span class="en">Push Through</span></h3>
+<dl class="mu"><dt>동작</dt><dd>문이나 창을 통과해 다른 공간으로</dd><dt>용도</dt><dd>편집 없이 카메라로 장면 전환</dd></dl>
+<div class="cam"><div class="cam-h"><span>CAMERA · 교체 가능</span><button class="copy" data-copy="Push through the café window into the room, ending on a medium shot of her.">복사</button></div><p class="mono">Push through the café window into the room, ending on a medium shot of her.</p></div><details class="four"><summary>실제 생성에 쓴 4요소 · 6초</summary><ul class="mono"><li><b>Movement:</b> <mark>push through</mark>, the camera glides forward <mark>through the open café window</mark></li><li><b>Speed:</b> steady, moderate</li><li><b>Framing:</b> keep the window table centered as the frame slides out of view</li><li><b>End:</b> stop on <mark>a medium shot</mark> of the table</li></ul></details>
+</div></article><article class="tech" id="m05">
+<div class="tech-media"><figure class="media"><video controls preload="none" playsinline poster="media/M05.jpg" aria-label="리버스 트래킹 예시 영상: 골목을 걸어오며 이야기하는 여성 앞에서 카메라가 뒤로 물러남"><source src="media/M05.mp4" type="video/mp4"></video><figcaption>M05 · 영상 (재생 버튼을 누르세요)</figcaption></figure><figure class="diag"><img src="media/diag_M05.png" alt="M05 카메라 움직임 그림" loading="lazy"></figure><div class="scene"><span>SCENE · 고정</span><p class="mono">She walks and talks, smiling, then stops and looks to the side.</p></div></div>
+<div class="tech-body">
+<p class="kicker">M05</p><h3>리버스 트래킹 <span class="en">Reverse Tracking</span></h3>
+<dl class="mu"><dt>동작</dt><dd>인물 앞에서 뒤로 물러나며 촬영</dd><dt>용도</dt><dd>걸으면서 대사하는 신</dd></dl>
+<div class="cam"><div class="cam-h"><span>CAMERA · 교체 가능</span><button class="copy" data-copy="Track backward in front of her at walking pace, holding a medium shot.">복사</button></div><p class="mono">Track backward in front of her at walking pace, holding a medium shot.</p></div><details class="four"><summary>실제 생성에 쓴 4요소 · 7초</summary><ul class="mono"><li><b>Movement:</b> <mark>reverse tracking</mark>, the camera <mark>moves backward in front of her</mark></li><li><b>Speed:</b> <mark>matches her walking pace</mark></li><li><b>Framing:</b> keep a steady medium shot of her face and upper body</li><li><b>End:</b> <mark>stop when she stops</mark> walking</li></ul></details>
+</div></article><article class="tech" id="m04">
+<div class="tech-media"><figure class="media"><video controls preload="none" playsinline poster="media/M04.jpg" aria-label="팔로 샷 예시 영상: 돌골목을 오르는 여성의 뒤를 카메라가 어깨 높이로 따라감"><source src="media/M04.mp4" type="video/mp4"></video><figcaption>M04 · 영상 (재생 버튼을 누르세요)</figcaption></figure><figure class="diag"><img src="media/diag_M04.png" alt="M04 카메라 움직임 그림" loading="lazy"></figure><div class="scene"><span>SCENE · 고정</span><p class="mono">She hurries up the alley, then stops at the corner.</p></div></div>
+<div class="tech-body">
+<p class="kicker">M04</p><h3>팔로 샷 <span class="en">Follow Shot</span></h3>
+<dl class="mu"><dt>동작</dt><dd>인물 뒤를 어깨 높이로 따라감</dd><dt>용도</dt><dd>이동·추격 신, 몰입이 가장 높음</dd></dl>
+<div class="cam"><div class="cam-h"><span>CAMERA · 교체 가능</span><button class="copy" data-copy="Follow behind her at shoulder height, stopping when she stops.">복사</button></div><p class="mono">Follow behind her at shoulder height, stopping when she stops.</p></div><details class="four"><summary>실제 생성에 쓴 4요소 · 6초</summary><ul class="mono"><li><b>Movement:</b> <mark>follow shot</mark>, the camera moves <mark>behind her at shoulder height</mark></li><li><b>Speed:</b> matches her brisk walking pace</li><li><b>Framing:</b> keep her back centered in a medium shot</li><li><b>End:</b> <mark>stop when she pauses</mark> at the bend of the alley</li></ul></details>
+</div></article><article class="tech" id="s03">
+<div class="tech-media"><figure class="media"><video controls preload="none" playsinline poster="media/S03.jpg" aria-label="사이드 트래킹 예시 영상: 방파제 길을 자전거로 달리는 여성의 옆모습을 카메라가 나란히 따라감"><source src="media/S03.mp4" type="video/mp4"></video><figcaption>S03 · 영상 (재생 버튼을 누르세요)</figcaption></figure><figure class="diag"><img src="media/diag_S03.png" alt="S03 카메라 움직임 그림" loading="lazy"></figure><div class="scene"><span>SCENE · 고정</span><p class="mono">She rides along the seawall, then slows and stops.</p></div></div>
+<div class="tech-body">
+<p class="kicker">S03</p><h3>사이드 트래킹 <span class="en">Side Tracking</span></h3>
+<dl class="mu"><dt>동작</dt><dd>인물 옆에서 나란히 평행 이동</dd><dt>용도</dt><dd>이동의 리듬</dd></dl>
+<div class="cam"><div class="cam-h"><span>CAMERA · 교체 가능</span><button class="copy" data-copy="Track sideways alongside her, keeping her in profile.">복사</button></div><p class="mono">Track sideways alongside her, keeping her in profile.</p></div><details class="four"><summary>실제 생성에 쓴 4요소 · 7초</summary><ul class="mono"><li><b>Movement:</b> <mark>side tracking</mark>, the camera moves <mark>sideways parallel to her</mark></li><li><b>Speed:</b> matches her cycling speed</li><li><b>Framing:</b> side profile; <mark>foreground posts pass quickly, the boats slowly</mark></li><li><b>End:</b> stop when she slows and puts a foot down</li></ul></details>
+</div></article><article class="tech" id="m03">
+<div class="tech-media"><figure class="media"><video controls preload="none" playsinline poster="media/M03.jpg" aria-label="90도 아크 시도 영상: 돌계단 위 여성 주위를 돌다가 멈추고 인물 쪽으로 다가갔다가 다시 회전"><source src="media/M03.mp4" type="video/mp4"></video><figcaption>M03 · 영상 (재생 버튼을 누르세요)</figcaption></figure><figure class="diag"><img src="media/diag_M03.png" alt="M03 카메라 움직임 그림" loading="lazy"></figure><div class="scene"><span>SCENE · 고정</span><p class="mono">A traveler in a yellow raincoat stands at the top of the stone stairs, looking out over the village.</p></div></div>
+<div class="tech-body">
+<p class="kicker">M03</p><h3>아크 샷 <span class="en">Arc Shot</span></h3>
+<dl class="mu"><dt>동작</dt><dd>인물 주위를 곡선으로 돈다</dd><dt>용도</dt><dd>첫 등장, 공간을 한 번에 설명</dd></dl>
+<div class="cam"><div class="cam-h"><span>CAMERA · 교체 가능</span><button class="copy" data-copy="Smooth continuous arc around her at eye level, keeping the same distance.">복사</button></div><p class="mono">Smooth continuous arc around her at eye level, keeping the same distance.</p></div><details class="four"><summary>처음 시도한 4요소 · 180도 (생성 필터에 걸려 실패)</summary><ul class="mono"><li><b>Movement:</b> <mark>arc shot</mark>, the camera <mark>circles around her in a 180-degree curve</mark></li><li><b>Speed:</b> smooth, moderate</li><li><b>Framing:</b> keep her centered while <mark>the village and harbor are revealed</mark></li><li><b>End:</b> <mark>stop in front of her</mark> with the harbor behind</li></ul></details><div class="fail"><p class="mono k">실패 사례 · 시간이 남으면 AI는 동작을 지어낸다</p>
+<p>위 영상은 <span class="mono">Slow arc 90 degrees around her at eye level, ending on her side profile with the harbor behind.</span>를 <b>8초</b>로 만든 결과입니다.</p>
+<p><b>무엇이 일어났나</b> · 회전 → <em>멈춤</em> → <em>인물 쪽으로 다가감</em> → 다시 회전</p>
+<p><b>왜</b> · 90도 회전에 8초는 깁니다. 남는 시간을 AI가 다른 움직임으로 채웠습니다.</p>
+<p><b>고치려면</b> · ① 길이를 동작에 맞게 <b>4–5초</b>로 ② CAMERA에 조건 추가: <span class="mono">constant speed, same distance, no pause</span></p>
+<p class="q">영상을 다시 보면서 어디서부터 이상해지는지 찾아보세요.</p></div>
+</div></article><article class="tech" id="m07">
+<div class="tech-media"><figure class="media"><video controls preload="none" playsinline poster="media/M07.jpg" aria-label="휩 팬 예시 영상: 빈 골목에서 카메라가 빠르게 휘둘러져 돌아선 여성에게 멈춤"><source src="media/M07.mp4" type="video/mp4"></video><figcaption>M07 · 영상 (재생 버튼을 누르세요)</figcaption></figure><figure class="diag"><img src="media/diag_M07.png" alt="M07 카메라 움직임 그림" loading="lazy"></figure><div class="scene"><span>SCENE · 고정</span><p class="mono">A sudden sound; she spins around to face it.</p></div></div>
+<div class="tech-body">
+<p class="kicker">M07</p><h3>휩 팬 <span class="en">Whip Pan</span></h3>
+<dl class="mu"><dt>동작</dt><dd>빠르게 휘둘러 잔상을 남김</dd><dt>용도</dt><dd>컷 전환, 타격감</dd></dl>
+<div class="cam"><div class="cam-h"><span>CAMERA · 교체 가능</span><button class="copy" data-copy="Whip pan fast to the right, landing sharply on her.">복사</button></div><p class="mono">Whip pan fast to the right, landing sharply on her.</p></div><details class="four"><summary>실제 생성에 쓴 4요소 · 4초</summary><ul class="mono"><li><b>Movement:</b> <mark>whip pan to the right</mark></li><li><b>Speed:</b> <mark>very fast, with heavy motion blur</mark></li><li><b>Framing:</b> start on the empty alley, <mark>land on her</mark> in a medium shot</li><li><b>End:</b> <mark>stop sharply</mark> on her as she turns around</li></ul></details>
+</div></article><article class="tech" id="m08">
+<div class="tech-media"><figure class="media"><video controls preload="none" playsinline poster="media/M08.jpg" aria-label="크레인 업 예시 영상: 광장에 선 여성에게서 카메라가 지붕 위로 솟아올라 인물이 작아짐"><source src="media/M08.mp4" type="video/mp4"></video><figcaption>M08 · 영상 (재생 버튼을 누르세요)</figcaption></figure><figure class="diag"><img src="media/diag_M08.png" alt="M08 카메라 움직임 그림" loading="lazy"></figure><div class="scene"><span>SCENE · 고정</span><p class="mono">She stands still in the plaza as the evening light fades.</p></div></div>
+<div class="tech-body">
+<p class="kicker">M08</p><h3>크레인 업 <span class="en">Crane Up</span></h3>
+<dl class="mu"><dt>동작</dt><dd>수직으로 솟구치며 인물이 작아짐</dd><dt>용도</dt><dd>신을 닫는 엔딩</dd></dl>
+<div class="cam"><div class="cam-h"><span>CAMERA · 교체 가능</span><button class="copy" data-copy="Crane straight up until she is small below the rooftops.">복사</button></div><p class="mono">Crane straight up until she is small below the rooftops.</p></div><details class="four"><summary>실제 생성에 쓴 4요소 · 8초</summary><ul class="mono"><li><b>Movement:</b> <mark>crane up</mark>, the camera <mark>rises straight up</mark></li><li><b>Speed:</b> slow and smooth</li><li><b>Framing:</b> keep her in the lower center <mark>as she grows smaller</mark></li><li><b>End:</b> <mark>stop high above the rooftops</mark></li></ul></details>
+</div></article><article class="tech" id="s05">
+<div class="tech-media"><figure class="media"><video controls preload="none" playsinline poster="media/S05.jpg" aria-label="드론 풀백 예시 영상: 방파제 끝에 선 여성에게서 카메라가 뒤로, 위로 빠지며 마을과 해안이 드러남"><source src="media/S05.mp4" type="video/mp4"></video><figcaption>S05 · 영상 (재생 버튼을 누르세요)</figcaption></figure><figure class="diag"><img src="media/diag_S05.png" alt="S05 카메라 움직임 그림" loading="lazy"></figure><div class="scene"><span>SCENE · 고정</span><p class="mono">She stands still at the end of the pier as the sun sets.</p></div></div>
+<div class="tech-body">
+<p class="kicker">S05</p><h3>드론 풀백 <span class="en">Drone Pullback</span></h3>
+<dl class="mu"><dt>동작</dt><dd>뒤로, 위로 동시에 빠짐</dd><dt>용도</dt><dd>규모 표현, 엔딩 컷의 정석</dd></dl>
+<div class="cam"><div class="cam-h"><span>CAMERA · 교체 가능</span><button class="copy" data-copy="Drone pullback, flying backward and upward until she is a tiny dot.">복사</button></div><p class="mono">Drone pullback, flying backward and upward until she is a tiny dot.</p></div><details class="four"><summary>실제 생성에 쓴 4요소 · 10초 롱테이크</summary><ul class="mono"><li><b>Movement:</b> <mark>drone pullback</mark>, the camera flies <mark>backward and upward at the same time</mark></li><li><b>Speed:</b> slow and smooth</li><li><b>Framing:</b> keep her in the center as <mark>the coastline is revealed</mark></li><li><b>End:</b> her as <mark>a tiny yellow dot</mark> on the pier</li></ul></details>
+</div></article><header class="part" id="p3"><p class="pno">PART 03</p><h2>운용 방식 3종</h2><p class="psub">카메라를 어떻게 들고 있나</p></header><article class="tech" id="a00">
+<div class="tech-media"><figure class="media"><video controls preload="none" playsinline poster="media/A00.jpg" aria-label="정지샷 예시 영상: 항구 산책로 벤치에 앉은 여성, 카메라는 고정되고 바람과 파도, 배만 움직임"><source src="media/A00.mp4" type="video/mp4"></video><figcaption>A00 · 영상 (재생 버튼을 누르세요)</figcaption></figure><figure class="diag"><img src="media/diag_A00.png" alt="A00 카메라 움직임 그림" loading="lazy"></figure><div class="scene"><span>SCENE · 고정</span><p class="mono">She sits still; only the wind in her hair, the waves and the boats move.</p></div></div>
+<div class="tech-body">
+<p class="kicker">A00</p><h3>고정 · 정지샷 <span class="en">Static / Locked-off</span></h3>
+<dl class="mu"><dt>동작</dt><dd>카메라를 전혀 움직이지 않음</dd><dt>용도</dt><dd>움직이지 않는 것도 하나의 선택</dd></dl>
+<div class="cam"><div class="cam-h"><span>CAMERA · 교체 가능</span><button class="copy" data-copy="Static locked-off shot; the frame never changes.">복사</button></div><p class="mono">Static locked-off shot; the frame never changes.</p></div><details class="four"><summary>실제 생성에 쓴 4요소 · 6초</summary><ul class="mono"><li><b>Movement:</b> <mark>none, a static locked-off shot</mark></li><li><b>Speed:</b> none</li><li><b>Framing:</b> keep the same symmetrical long shot</li><li><b>End:</b> <mark>the frame never changes</mark></li></ul></details>
+</div></article><article class="tech" id="m06">
+<div class="tech-media"><figure class="media"><video controls preload="none" playsinline poster="media/M06.jpg" aria-label="핸드헬드 예시 영상: 부두를 서두르는 여성을 손으로 든 듯 흔들리는 카메라가 따라감"><source src="media/M06.mp4" type="video/mp4"></video><figcaption>M06 · 영상 (재생 버튼을 누르세요)</figcaption></figure><figure class="diag"><img src="media/diag_M06.png" alt="M06 카메라 움직임 그림" loading="lazy"></figure><div class="scene"><span>SCENE · 고정</span><p class="mono">She hurries along the dock, uneasy, and glances behind her.</p></div></div>
+<div class="tech-body">
+<p class="kicker">M06</p><h3>핸드헬드 <span class="en">Handheld</span></h3>
+<dl class="mu"><dt>동작</dt><dd>손으로 든 듯한 미세한 흔들림</dd><dt>용도</dt><dd>현장감·불안·다큐 느낌</dd></dl>
+<div class="cam"><div class="cam-h"><span>CAMERA · 교체 가능</span><button class="copy" data-copy="Handheld with small natural shakes, loosely following her face.">복사</button></div><p class="mono">Handheld with small natural shakes, loosely following her face.</p></div><details class="four"><summary>실제 생성에 쓴 4요소 · 6초</summary><ul class="mono"><li><b>Movement:</b> <mark>handheld</mark>, with <mark>small natural shakes and breathing</mark></li><li><b>Speed:</b> loose, reacting to her movement</li><li><b>Framing:</b> roughly keep her face and shoulders in a medium close-up</li><li><b>End:</b> <mark>settle on her face</mark> as she looks back</li></ul></details>
+</div></article><article class="tech" id="m09">
+<div class="tech-media"><figure class="media"><video controls preload="none" playsinline poster="media/M09.jpg" aria-label="스노리캠 예시 영상: 겁에 질린 여성의 얼굴은 화면 가운데 고정되고 뒤의 골목만 흔들림"><source src="media/M09.mp4" type="video/mp4"></video><figcaption>M09 · 영상 (재생 버튼을 누르세요)</figcaption></figure><figure class="diag"><img src="media/diag_M09.png" alt="M09 카메라 움직임 그림" loading="lazy"></figure><div class="scene"><span>SCENE · 고정</span><p class="mono">She staggers through the alley in panic, then leans against a wall.</p></div></div>
+<div class="tech-body">
+<p class="kicker">M09</p><h3>스노리캠 <span class="en">Snorricam</span></h3>
+<dl class="mu"><dt>동작</dt><dd>카메라를 몸에 고정, 배경만 흔들림</dd><dt>용도</dt><dd>정신이 무너지는 장면</dd></dl>
+<div class="cam"><div class="cam-h"><span>CAMERA · 교체 가능</span><button class="copy" data-copy="Snorricam: camera fixed to her body, her face locked in the center.">복사</button></div><p class="mono">Snorricam: camera fixed to her body, her face locked in the center.</p></div><details class="four"><summary>실제 생성에 쓴 4요소 · 6초</summary><ul class="mono"><li><b>Movement:</b> <mark>snorricam</mark>, the camera is <mark>mounted on her body</mark></li><li><b>Speed:</b> follows her unsteady movement</li><li><b>Framing:</b> <mark>her face stays locked in the center; only the background sways</mark></li><li><b>End:</b> stop when she leans against a wall</li></ul></details>
+</div></article><header class="part" id="p4"><p class="pno">PART 04</p><h2>앵글과 위치 6종</h2><p class="psub">어디서, 어떤 높이로 보나 · 기준은 눈높이(아이 레벨)</p></header><section class="block"><h3 class="sub">올려다보기와 내려다보기는 한 세트</h3><div class="pair"><article class="still" id="a02"><figure class="media"><img src="media/A02.jpg" alt="로우 앵글: 돌계단 위에 선 여성을 계단 쪽에서 바라봄" loading="lazy"></figure>
+<p class="kicker">A02</p><h4>로우 앵글 <span class="en">Low Angle</span></h4>
+<dl class="mu"><dt>동작</dt><dd>지면 가까이서 올려다봄</dd><dt>용도</dt><dd>위압감, 영웅적인 인물</dd></dl>
+<div class="cam"><div class="cam-h"><span>이미지 프롬프트</span><button class="copy" data-copy="Low-angle shot with the camera close to the ground, looking up.">복사</button></div><p class="mono">Low-angle shot with the camera close to the ground, looking up.</p></div></article><article class="still" id="a03"><figure class="media"><img src="media/A03.jpg" alt="하이 앵글: 위에서 내려다본 긴 돌계단 아래쪽에 작게 앉은 여성" loading="lazy"></figure>
+<p class="kicker">A03</p><h4>하이 앵글 <span class="en">High Angle</span></h4>
+<dl class="mu"><dt>동작</dt><dd>위에서 내려다봄</dd><dt>용도</dt><dd>무력함, 고립, 감시당하는 느낌</dd></dl>
+<div class="cam"><div class="cam-h"><span>이미지 프롬프트</span><button class="copy" data-copy="High-angle shot looking down at about 45 degrees; she sits small at the bottom of the stairs.">복사</button></div><p class="mono">High-angle shot looking down at about 45 degrees; she sits small at the bottom of the stairs.</p></div></article></div></section><section class="block"><h3 class="sub">수직으로 내리꽂기, 기울이기</h3><div class="pair"><article class="still" id="a04"><figure class="media"><img src="media/A04.jpg" alt="오버헤드: 바로 위에서 내려다본 둥근 돌 광장 한가운데의 여성과 긴 그림자" loading="lazy"></figure>
+<p class="kicker">A04</p><h4>오버헤드 <span class="en">Overhead</span></h4>
+<dl class="mu"><dt>동작</dt><dd>정확히 수직 90도로 내려다봄</dd><dt>용도</dt><dd>상황 요약, 운명적인 시선</dd></dl>
+<div class="cam"><div class="cam-h"><span>이미지 프롬프트</span><button class="copy" data-copy="Overhead shot, exactly 90 degrees straight down; the scene looks flat, like a graphic pattern.">복사</button></div><p class="mono">Overhead shot, exactly 90 degrees straight down; the scene looks flat, like a graphic pattern.</p></div></article><article class="still" id="a05"><figure class="media"><img src="media/A05.jpg" alt="더치 앵글: 해 질 녘 돌골목에서 옆을 바라보는 여성" loading="lazy"></figure>
+<p class="kicker">A05</p><h4>더치 앵글 <span class="en">Dutch Angle</span></h4>
+<dl class="mu"><dt>동작</dt><dd>수평선을 약 20도 기울임</dd><dt>용도</dt><dd>불안·왜곡, 길게 쓰면 피로감</dd></dl>
+<div class="cam"><div class="cam-h"><span>이미지 프롬프트</span><button class="copy" data-copy="Medium shot with the horizon tilted about 20 degrees (Dutch angle); she glances sideways, uneasy.">복사</button></div><p class="mono">Medium shot with the horizon tilted about 20 degrees (Dutch angle); she glances sideways, uneasy.</p></div></article></div></section><section class="block"><h3 class="sub">누구의 자리에서 보나</h3><div class="pair"><article class="still" id="a01"><figure class="media"><img src="media/A01.jpg" alt="리어 샷: 해 지는 바다를 바라보는 여성의 뒷모습" loading="lazy"></figure>
+<p class="kicker">A01</p><h4>리어 샷 <span class="en">Rear Shot</span></h4>
+<dl class="mu"><dt>위치</dt><dd>인물 뒤에 고정, 뒷모습만 꽉 차게</dd><dt>용도</dt><dd>표정을 숨겨 관객이 감정을 상상</dd></dl>
+<div class="cam"><div class="cam-h"><span>이미지 프롬프트</span><button class="copy" data-copy="Medium shot from directly behind at shoulder height. Her back and the back of her head fill most of the frame; her face is not visible.">복사</button></div><p class="mono">Medium shot from directly behind at shoulder height. Her back and the back of her head fill most of the frame; her face is not visible.</p></div></article></div></section><article class="tech" id="s04">
+<div class="tech-media"><figure class="media"><video controls preload="none" playsinline poster="media/S04.jpg" aria-label="1인칭 시점 예시 영상: 필름 카메라를 든 두 손이 화면 아래에 보이고 돌계단을 내려가며 항구를 향함"><source src="media/S04.mp4" type="video/mp4"></video><figcaption>S04 · 영상 (재생 버튼을 누르세요)</figcaption></figure><figure class="diag"><img src="media/diag_S04.png" alt="S04 카메라 움직임 그림" loading="lazy"></figure><div class="scene"><span>SCENE · 고정</span><p class="mono">Walking down the stairs, she lifts the film camera to take a photo of the harbor.</p></div></div>
+<div class="tech-body">
+<p class="kicker">S04</p><h3>1인칭 시점 <span class="en">POV</span></h3>
+<dl class="mu"><dt>위치</dt><dd>인물의 눈 자리, 손만 화면 아래에</dd><dt>용도</dt><dd>관객을 인물 안에 집어넣기</dd></dl>
+<div class="cam"><div class="cam-h"><span>CAMERA · 교체 가능</span><button class="copy" data-copy="First-person POV at her eye level; only her hands visible.">복사</button></div><p class="mono">First-person POV at her eye level; only her hands visible.</p></div><details class="four"><summary>실제 생성에 쓴 4요소 · 6초</summary><ul class="mono"><li><b>Movement:</b> <mark>first-person POV</mark>, walking down the stairs</li><li><b>Speed:</b> natural walking pace with a gentle step bounce</li><li><b>Framing:</b> keep <mark>both hands and the film camera at the bottom</mark></li><li><b>End:</b> stop as the hands raise the camera</li></ul></details>
+</div></article><header class="part" id="p5"><p class="pno">PART 05</p><h2>렌즈와 초점 3종</h2><p class="psub">카메라는 그대로, 렌즈가 바꾸는 것</p></header><article class="tech" id="m02">
+<div class="tech-media"><figure class="media sq"><video controls preload="none" playsinline poster="media/M02.jpg" aria-label="슬로 줌 인 예시 영상: 바닷가 데크에 앉은 여성에게 렌즈가 당겨짐"><source src="media/M02.mp4" type="video/mp4"></video><figcaption>M02 · 영상 (재생 버튼을 누르세요)</figcaption></figure><figure class="diag"><img src="media/diag_M02.png" alt="M02 카메라 움직임 그림" loading="lazy"></figure><div class="scene"><span>SCENE · 고정</span><p class="mono">She sits perfectly still, breathing tensely, eyes fixed on the sea.</p></div></div>
+<div class="tech-body">
+<p class="kicker">M02</p><h3>슬로 줌 인 <span class="en">Slow Zoom In</span></h3>
+<dl class="mu"><dt>동작</dt><dd>카메라는 고정, 렌즈만 당김</dd><dt>용도</dt><dd>조용히 긴장 쌓기, 압박감</dd></dl>
+<div class="cam"><div class="cam-h"><span>CAMERA · 교체 가능</span><button class="copy" data-copy="Slow optical zoom in; the camera itself does not move.">복사</button></div><p class="mono">Slow optical zoom in; the camera itself does not move.</p></div><details class="four"><summary>실제 생성에 쓴 4요소 · 7초</summary><ul class="mono"><li><b>Movement:</b> <mark>slow optical zoom in</mark>; the camera body stays <mark>locked on a tripod</mark></li><li><b>Speed:</b> very slow, almost unnoticeable</li><li><b>Framing:</b> keep her centered; <mark>the background flattens</mark></li><li><b>End:</b> stop on a medium close-up of her face</li></ul></details><p class="note">이 영상에는 프롬프트의 <span class="mono">tripod</span> 때문에 삼각대가 화면에 등장합니다. 규칙 2(장비 대신 결과를 쓴다)의 실제 예입니다.</p>
+</div></article><section class="block"><h3 class="sub">달리 인과 줌 인은 배경이 다르다</h3>
+<div class="tw"><table><thead><tr><th></th><th>달리 인</th><th>줌 인</th></tr></thead><tbody>
+<tr><th>움직이는 것</th><td>카메라 몸체</td><td>렌즈만</td></tr>
+<tr><th>배경</th><td>앞뒤가 서로 다른 속도로 흐름</td><td>화면 전체가 같은 비율로 커짐</td></tr>
+<tr><th>공간감</th><td>공간이 열린다</td><td>배경이 인물 뒤로 눌러 붙는다</td></tr>
+<tr><th>느낌</th><td>공간을 통과해 다가감</td><td>조용한 압박, 긴장</td></tr></tbody></table></div>
+<p>프롬프트에는 <span class="mono">the camera moves forward (not a zoom)</span>처럼 둘을 구분해서 적습니다. 위의 M01과 M02를 이어서 재생해 비교해 보세요.</p></section><article class="tech" id="s01">
+<div class="tech-media"><figure class="media"><video controls preload="none" playsinline poster="media/S01.jpg" aria-label="돌리 줌 예시 영상: 충격받은 여성의 얼굴 크기는 그대로인데 뒤의 마을과 항구가 늘어나며 뒤틀림"><source src="media/S01.mp4" type="video/mp4"></video><figcaption>S01 · 영상 (재생 버튼을 누르세요)</figcaption></figure><figure class="diag"><img src="media/diag_S01.png" alt="S01 카메라 움직임 그림" loading="lazy"></figure><div class="scene"><span>SCENE · 고정</span><p class="mono">She freezes in shock, as if the ground is falling away beneath her.</p></div></div>
+<div class="tech-body">
+<p class="kicker">S01</p><h3>돌리 줌 <span class="en">Dolly Zoom</span></h3>
+<dl class="mu"><dt>동작</dt><dd>뒤로 빠지며 줌 인, 배경만 늘어남</dd><dt>용도</dt><dd>충격, 발밑이 꺼지는 순간</dd></dl>
+<div class="cam"><div class="cam-h"><span>CAMERA · 교체 가능</span><button class="copy" data-copy="Dolly zoom: move back while zooming in; her face stays the same size.">복사</button></div><p class="mono">Dolly zoom: move back while zooming in; her face stays the same size.</p></div><details class="four"><summary>실제 생성에 쓴 4요소 · 5초</summary><ul class="mono"><li><b>Movement:</b> <mark>dolly zoom</mark>, <mark>dolly backward while the lens zooms in</mark></li><li><b>Speed:</b> slow and steady</li><li><b>Framing:</b> <mark>her face stays exactly the same size</mark>; only the background warps</li><li><b>End:</b> stop when the background is fully stretched</li></ul></details>
+</div></article><article class="tech" id="s02">
+<div class="tech-media"><figure class="media"><video controls preload="none" playsinline poster="media/S02.jpg" aria-label="랙 포커스 예시 영상: 탁자 위 필름 카메라에서 문 앞에 선 여성으로 초점이 옮겨감"><source src="media/S02.mp4" type="video/mp4"></video><figcaption>S02 · 영상 (재생 버튼을 누르세요)</figcaption></figure><figure class="diag"><img src="media/diag_S02.png" alt="S02 카메라 움직임 그림" loading="lazy"></figure><div class="scene"><span>SCENE · 고정</span><p class="mono">She steps in through the door and notices the film camera on the table.</p></div></div>
+<div class="tech-body">
+<p class="kicker">S02</p><h3>랙 포커스 <span class="en">Rack Focus</span></h3>
+<dl class="mu"><dt>동작</dt><dd>카메라는 그대로, 초점만 앞→뒤</dd><dt>용도</dt><dd>시선 강제 이동, 숨은 정보 공개</dd></dl>
+<div class="cam"><div class="cam-h"><span>CAMERA · 교체 가능</span><button class="copy" data-copy="Rack focus from the object in front to her face; no camera move.">복사</button></div><p class="mono">Rack focus from the object in front to her face; no camera move.</p></div><details class="four"><summary>실제 생성에 쓴 4요소 · 5초</summary><ul class="mono"><li><b>Movement:</b> <mark>rack focus only</mark>; the camera does not move at all</li><li><b>Speed:</b> one smooth focus pull over about two seconds</li><li><b>Framing:</b> <mark>the film camera in front, her at the door</mark></li><li><b>End:</b> <mark>her face sharp, the film camera blurred</mark></li></ul></details>
+</div></article><section class="block" id="recap"><h3 class="sub">21가지 기법, 무엇을 정하는가로 나누면</h3>
+<div class="tw"><table><thead><tr><th>분류</th><th>정하는 것</th><th>기법</th></tr></thead><tbody>
+<tr><th>움직임 9</th><td>카메라의 이동</td><td>달리 인 · 푸시 스루 · 리버스 트래킹 · 팔로 · 사이드 트래킹 · 아크 · 휩 팬 · 크레인 업 · 드론 풀백</td></tr>
+<tr><th>운용 방식 3</th><td>카메라를 드는 방법</td><td>고정(정지샷) · 핸드헬드 · 스노리캠</td></tr>
+<tr><th>앵글 4</th><td>보는 높이와 기울기</td><td>로우 · 하이 · 오버헤드 · 더치 (기준은 아이 레벨)</td></tr>
+<tr><th>위치·시점 2</th><td>누구의 자리에서 보나</td><td>리어 샷 · 1인칭 시점</td></tr>
+<tr><th>렌즈·초점 3</th><td>크기와 선명도</td><td>줌 인 · 랙 포커스 · 돌리 줌(이동 + 줌)</td></tr>
+</tbody></table></div>
+<p class="note">원본 영상은 접근 · 회전과 이동 · 높이 · 시점 · 왜곡과 초점의 5묶음으로 나눴습니다. 기억하기 쉬운 실전 분류이고, 위 표는 촬영 용어 기준의 분류입니다.</p></section><header class="part" id="p6"><p class="pno">PART 06</p><h2>프레임 사이즈 9종</h2><p class="psub">인물을 어디서 자르나</p></header><section class="block"><h3 class="sub">기준은 하나, 인물의 어디서 자르나</h3>
+<div class="tw"><table><thead><tr><th>ID</th><th>사이즈</th><th>자르는 위치</th><th>주로 쓰는 때</th></tr></thead><tbody>
+<tr><td class="mono">F01</td><th>익스트림 롱샷</th><td>인물이 점처럼 작게</td><td>공간이 주인공, 오프닝·엔딩</td></tr>
+<tr><td class="mono">F02</td><th>롱샷</th><td>전신 + 위아래 여백</td><td>장소 설명(설정 샷)</td></tr>
+<tr><td class="mono">F03</td><th>풀샷</th><td>머리끝~발끝 딱 맞게</td><td>의상·동작 전체, 액션</td></tr>
+<tr><td class="mono">F04</td><th>미디엄 풀샷</th><td>무릎 아래</td><td>두 사람 대화</td></tr>
+<tr><td class="mono">F05</td><th>미디엄 샷</th><td>허리</td><td>대화의 기본</td></tr>
+<tr><td class="mono">F06</td><th>미디엄 클로즈업</th><td>가슴 중간</td><td>뉴스·인터뷰</td></tr>
+<tr><td class="mono">F07</td><th>클로즈업</th><td>머리와 어깨</td><td>감정 전달의 주력</td></tr>
+<tr><td class="mono">F08</td><th>빅 클로즈업</th><td>이마~턱(정수리 잘림)</td><td>감정의 정점</td></tr>
+<tr><td class="mono">F09</td><th>익스트림 클로즈업</th><td>눈만</td><td>디테일, 긴장의 정점</td></tr>
+</tbody></table></div></section><section class="block"><div class="grid3"><article class="still" id="f01"><figure class="media"><img src="media/F01.jpg" alt="익스트림 롱샷: 언덕 위에서 내려다본 만과 항구, 노란 점처럼 작게 선 인물" loading="lazy"></figure>
+<p class="kicker">F01</p><h4>익스트림 롱샷 <span class="en">ELS</span></h4>
+<dl class="mu"><dt>자르기</dt><dd>인물이 점처럼 작게</dd><dt>용도</dt><dd>공간이 주인공, 오프닝·엔딩</dd></dl>
+<div class="cam"><div class="cam-h"><span>이미지 프롬프트</span><button class="copy" data-copy="Extreme long shot from far away on the opposite hillside: the whole bay and village fill the frame; she is a tiny yellow figure in the lower third.">복사</button></div><p class="mono">Extreme long shot from far away on the opposite hillside: the whole bay and village fill the frame; she is a tiny yellow figure in the lower third.</p></div></article><article class="still" id="f02"><figure class="media"><img src="media/F02.jpg" alt="롱샷: 항구 산책로 난간 앞에 선 여성의 전신, 뒤로 어선과 마을" loading="lazy"></figure>
+<p class="kicker">F02</p><h4>롱샷 <span class="en">Long Shot</span></h4>
+<dl class="mu"><dt>자르기</dt><dd>전신, 화면 높이의 1/3 정도</dd><dt>용도</dt><dd>여기가 어디인지 설명(설정 샷)</dd></dl>
+<div class="cam"><div class="cam-h"><span>이미지 프롬프트</span><button class="copy" data-copy="Long shot (establishing shot): her full body takes up only about one third of the frame height; the promenade and village fill the rest.">복사</button></div><p class="mono">Long shot (establishing shot): her full body takes up only about one third of the frame height; the promenade and village fill the rest.</p></div></article><article class="still" id="f03"><figure class="media"><img src="media/F03.jpg" alt="풀샷: 머리부터 발끝까지 화면에 꽉 차게 선 여성" loading="lazy"></figure>
+<p class="kicker">F03</p><h4>풀샷 <span class="en">Full Shot</span></h4>
+<dl class="mu"><dt>자르기</dt><dd>머리끝부터 발끝까지 딱 맞게</dd><dt>용도</dt><dd>의상·동작 전체, 액션의 시작</dd></dl>
+<div class="cam"><div class="cam-h"><span>이미지 프롬프트</span><button class="copy" data-copy="Full shot: from the top of her head to her feet, fitting the frame tightly.">복사</button></div><p class="mono">Full shot: from the top of her head to her feet, fitting the frame tightly.</p></div></article><article class="still" id="f04"><figure class="media"><img src="media/F04.jpg" alt="미디엄 풀샷: 무릎 아래에서 잘린 여성" loading="lazy"></figure>
+<p class="kicker">F04</p><h4>미디엄 풀샷 <span class="en">Cowboy Shot</span></h4>
+<dl class="mu"><dt>자르기</dt><dd>무릎 아래에서 자름</dd><dt>용도</dt><dd>두 사람이 대화하는 장면</dd></dl>
+<div class="cam"><div class="cam-h"><span>이미지 프롬프트</span><button class="copy" data-copy="Medium full shot (cowboy shot): framed from her head down to just below the knees.">복사</button></div><p class="mono">Medium full shot (cowboy shot): framed from her head down to just below the knees.</p></div></article><article class="still" id="f05"><figure class="media"><img src="media/F05.jpg" alt="미디엄 샷: 허리에서 잘린 여성" loading="lazy"></figure>
+<p class="kicker">F05</p><h4>미디엄 샷 <span class="en">Medium Shot</span></h4>
+<dl class="mu"><dt>자르기</dt><dd>허리에서 자름</dd><dt>용도</dt><dd>대화의 기본, 고민되면 여기서 시작</dd></dl>
+<div class="cam"><div class="cam-h"><span>이미지 프롬프트</span><button class="copy" data-copy="Medium shot: framed from her head down to the waist.">복사</button></div><p class="mono">Medium shot: framed from her head down to the waist.</p></div></article><article class="still" id="f06"><figure class="media"><img src="media/F06.jpg" alt="미디엄 클로즈업: 가슴 중간에서 잘리고 한 손을 든 여성" loading="lazy"></figure>
+<p class="kicker">F06</p><h4>미디엄 클로즈업 <span class="en">MCU</span></h4>
+<dl class="mu"><dt>자르기</dt><dd>가슴 중간에서 자름</dd><dt>용도</dt><dd>뉴스·인터뷰, 표정과 손짓을 함께</dd></dl>
+<div class="cam"><div class="cam-h"><span>이미지 프롬프트</span><button class="copy" data-copy="Medium close-up: head to the middle of the chest, one hand raised in a small gesture.">복사</button></div><p class="mono">Medium close-up: head to the middle of the chest, one hand raised in a small gesture.</p></div></article><article class="still" id="f07"><figure class="media"><img src="media/F07.jpg" alt="클로즈업: 머리와 어깨만 보이는 여성" loading="lazy"></figure>
+<p class="kicker">F07</p><h4>클로즈업 <span class="en">Close-up</span></h4>
+<dl class="mu"><dt>자르기</dt><dd>머리와 어깨만 남김</dd><dt>용도</dt><dd>감정을 전달하는 주력 샷</dd></dl>
+<div class="cam"><div class="cam-h"><span>이미지 프롬프트</span><button class="copy" data-copy="Close-up: only her head and shoulders fill the frame.">복사</button></div><p class="mono">Close-up: only her head and shoulders fill the frame.</p></div></article><article class="still" id="f08"><figure class="media"><img src="media/F08.jpg" alt="빅 클로즈업: 이마부터 턱까지 화면을 채운 얼굴" loading="lazy"></figure>
+<p class="kicker">F08</p><h4>빅 클로즈업 <span class="en">Big Close-up</span></h4>
+<dl class="mu"><dt>자르기</dt><dd>이마부터 턱까지, 정수리 잘림</dd><dt>용도</dt><dd>감정이 최고조일 때</dd></dl>
+<div class="cam"><div class="cam-h"><span>이미지 프롬프트</span><button class="copy" data-copy="Big close-up: forehead to chin; the top of her head is cut off.">복사</button></div><p class="mono">Big close-up: forehead to chin; the top of her head is cut off.</p></div></article><article class="still" id="f09"><figure class="media"><img src="media/F09.jpg" alt="익스트림 클로즈업: 두 눈만 화면을 채우고 눈동자에 항구가 비침" loading="lazy"></figure>
+<p class="kicker">F09</p><h4>익스트림 클로즈업 <span class="en">ECU</span></h4>
+<dl class="mu"><dt>자르기</dt><dd>눈만 화면 가득</dd><dt>용도</dt><dd>디테일, 긴장의 정점</dd></dl>
+<div class="cam"><div class="cam-h"><span>이미지 프롬프트</span><button class="copy" data-copy="Extreme close-up: only her eyes fill the frame, with the harbor light reflected in them.">복사</button></div><p class="mono">Extreme close-up: only her eyes fill the frame, with the harbor light reflected in them.</p></div></article></div><p class="quote">멀면 관객은 관찰자, 가까우면 당사자.</p></section><section class="block"><h3 class="sub">누가 몇 명, 어떤 관계로 들어가나</h3>
+<div class="tw"><table><thead><tr><th>이름</th><th>화면에 담는 것</th></tr></thead><tbody>
+<tr><th>싱글</th><td>한 명</td></tr><tr><th>투샷 · 쓰리샷</th><td>두 명 · 세 명</td></tr>
+<tr><th>오버 더 숄더</th><td>한 사람 어깨 너머의 상대</td></tr><tr><th>인서트</th><td>손, 소품 같은 세부</td></tr>
+<tr><th>컷어웨이</th><td>주 장면 밖의 다른 것</td></tr><tr><th>리액션</th><td>듣는 쪽의 반응</td></tr></tbody></table></div>
+<div class="pair"><figure class="media"><img src="media/R01.jpg" alt="투샷: 바닷가 카페 창가 테이블에 마주 앉은 두 사람" loading="lazy"><figcaption>R01 · 투샷</figcaption></figure><figure class="media"><img src="media/R02.jpg" alt="오버 더 숄더: 남성의 어깨 너머로 보이는 여성의 얼굴" loading="lazy"><figcaption>R02 · 오버 더 숄더</figcaption></figure></div></section><header class="part" id="p7"><p class="pno">PART 07</p><h2>실전 워크플로</h2><p class="psub">캐릭터 시트, 컷 길이, 작업 순서</p></header><section class="block"><h3 class="sub">캐릭터 시트는 세 패널이면 충분하다</h3><div class="sheet"><figure class="media"><img src="media/C00.jpg" alt="캐릭터 시트: 머리 없는 전신 정면, 전신 후면, 얼굴 클로즈업의 세 패널" loading="lazy"><figcaption>C00 · 캐릭터 시트</figcaption></figure><div><ol><li>전신 정면, 머리 없이 (마네킹)</li><li>전신 후면</li><li>얼굴 클로즈업</li></ol>
+<p>얼굴 정보는 ③이 담당하니 ①에 넣을 이유가 없습니다.</p>
+<p>시트에 인물 그림이 많을수록 같은 얼굴이 여러 명 생기기 쉽습니다.</p>
+<p class="note">이 페이지의 예시 영상은 대부분 이 시트 한 장을 레퍼런스로 만들었습니다.</p></div></div></section><section class="block"><h3 class="sub">15초, 30초를 통으로 뽑지 않는다</h3>
+<div class="three">
+<div><h4>AI는 주어진 시간을 채운다</h4><p>7초 분량을 30초로 뽑으면 나머지 23초는 AI가 지어냅니다. 위 아크 샷 실패 사례가 그 예입니다.</p></div>
+<div><h4>영화 문법은 짧다</h4><p>상업 영화의 컷은 대체로 3~5초 안에 바뀝니다.</p></div>
+<div><h4>수정 비용이 줄어든다</h4><p>실패하면 30초 전체 대신 7초짜리 하나만 다시 뽑습니다.</p></div></div>
+<div class="tw"><table><thead><tr><th>컷의 목적</th><th>길이</th></tr></thead><tbody>
+<tr><td>사물·인서트</td><td class="mono">3–4초</td></tr><tr><td>이동·액션</td><td class="mono">5–7초</td></tr>
+<tr><td>설정 샷</td><td class="mono">5–8초</td></tr><tr><td>감정·대사</td><td class="mono">7–10초</td></tr>
+<tr><td>롱테이크</td><td class="mono">10초 이상 · 무브먼트는 반드시 하나만</td></tr></tbody></table></div></section><section class="block"><h3 class="sub">한 편을 만드는 다섯 단계</h3>
+<ol class="flow"><li><b>캐릭터 시트</b><span>3패널로 만든다</span></li><li><b>SCENE 블록</b><span>한 번 쓰고 고정</span></li>
+<li><b>CAMERA 블록</b><span>카드에서 골라 교체</span></li><li><b>컷 길이</b><span>컷의 목적에 맞게</span></li><li><b>편집</b><span>타임라인에 순서대로</span></li></ol>
+<p>어렵게 느껴졌던 것은 실력이 아니라 순서를 몰랐기 때문입니다. 다만 가장 어려운 것은 여전히 <b>무엇을 이야기할지</b>입니다.</p></section><section class="summary" id="summary"><p class="mono k">SUMMARY</p>
+<p class="big2">카메라는 다섯 가지로,<br>프롬프트는 두 블록으로,<br>컷은 하나씩.</p>
+<p>움직임 · 운용 · 앵글 · 렌즈 · 사이즈를 따로 정하고, 장면은 SCENE에 고정하고 CAMERA 블록만 갈아 끼우고, 한 컷에 움직임 하나와 목적에 맞는 길이를 준다.</p></section><section class="block" id="cards"><h2 class="sec">부록 · 카메라 카드</h2><p>SCENE 블록 아래에 그대로 붙여 쓰는 한 줄짜리 CAMERA 블록입니다. <span class="mono">her</span>, <span class="mono">the window</span> 같은 대상만 자기 장면에 맞게 바꾸세요. 움직임 카드는 한 컷에 하나만 고르고, 운용·앵글 카드와는 함께 써도 됩니다.</p><h3 class="sub">움직임 9</h3><div class="tw"><table class="cards"><tbody><tr><th>달리 인</th><td class="mono">Slow dolly in toward her face, ending on a close-up.</td><td><button class="copy" data-copy="Slow dolly in toward her face, ending on a close-up.">복사</button></td></tr><tr><th>푸시 스루</th><td class="mono">Push through the window into the room, ending on a medium shot of her.</td><td><button class="copy" data-copy="Push through the window into the room, ending on a medium shot of her.">복사</button></td></tr><tr><th>리버스 트래킹</th><td class="mono">Track backward in front of her at walking pace, holding a medium shot.</td><td><button class="copy" data-copy="Track backward in front of her at walking pace, holding a medium shot.">복사</button></td></tr><tr><th>팔로</th><td class="mono">Follow behind her at shoulder height, stopping when she stops.</td><td><button class="copy" data-copy="Follow behind her at shoulder height, stopping when she stops.">복사</button></td></tr><tr><th>사이드 트래킹</th><td class="mono">Track sideways alongside her, keeping her in profile.</td><td><button class="copy" data-copy="Track sideways alongside her, keeping her in profile.">복사</button></td></tr><tr><th>아크</th><td class="mono">Arc 180 degrees around her at eye level, ending in front of her.</td><td><button class="copy" data-copy="Arc 180 degrees around her at eye level, ending in front of her.">복사</button></td></tr><tr><th>휩 팬</th><td class="mono">Whip pan fast to the right, landing sharply on her.</td><td><button class="copy" data-copy="Whip pan fast to the right, landing sharply on her.">복사</button></td></tr><tr><th>크레인 업</th><td class="mono">Crane straight up until she is small below the rooftops.</td><td><button class="copy" data-copy="Crane straight up until she is small below the rooftops.">복사</button></td></tr><tr><th>드론 풀백</th><td class="mono">Drone pullback, flying backward and upward until she is a tiny dot.</td><td><button class="copy" data-copy="Drone pullback, flying backward and upward until she is a tiny dot.">복사</button></td></tr></tbody></table></div><h3 class="sub">운용 3 · 앵글 4 · 위치 2</h3><div class="tw"><table class="cards"><tbody><tr><th>고정</th><td class="mono">Static shot; the camera does not move and the frame never changes.</td><td><button class="copy" data-copy="Static shot; the camera does not move and the frame never changes.">복사</button></td></tr><tr><th>핸드헬드</th><td class="mono">Handheld with small natural shakes, loosely following her face.</td><td><button class="copy" data-copy="Handheld with small natural shakes, loosely following her face.">복사</button></td></tr><tr><th>스노리캠</th><td class="mono">Camera fixed to her body; her face locked in center, background swaying.</td><td><button class="copy" data-copy="Camera fixed to her body; her face locked in center, background swaying.">복사</button></td></tr><tr><th>아이 레벨 (기준)</th><td class="mono">Eye-level shot.</td><td><button class="copy" data-copy="Eye-level shot.">복사</button></td></tr><tr><th>로우 앵글</th><td class="mono">Low-angle shot from near the ground, looking up at her.</td><td><button class="copy" data-copy="Low-angle shot from near the ground, looking up at her.">복사</button></td></tr><tr><th>하이 앵글</th><td class="mono">High-angle shot looking down at her at about 45 degrees.</td><td><button class="copy" data-copy="High-angle shot looking down at her at about 45 degrees.">복사</button></td></tr><tr><th>오버헤드</th><td class="mono">Overhead shot, exactly 90 degrees straight down.</td><td><button class="copy" data-copy="Overhead shot, exactly 90 degrees straight down.">복사</button></td></tr><tr><th>더치 앵글</th><td class="mono">Dutch angle, horizon tilted about 20 degrees.</td><td><button class="copy" data-copy="Dutch angle, horizon tilted about 20 degrees.">복사</button></td></tr><tr><th>리어 샷</th><td class="mono">Rear shot from directly behind her; her face is not visible.</td><td><button class="copy" data-copy="Rear shot from directly behind her; her face is not visible.">복사</button></td></tr><tr><th>1인칭 시점</th><td class="mono">First-person POV at her eye level; only her hands visible.</td><td><button class="copy" data-copy="First-person POV at her eye level; only her hands visible.">복사</button></td></tr></tbody></table></div><h3 class="sub">렌즈 3</h3><div class="tw"><table class="cards"><tbody><tr><th>줌 인</th><td class="mono">Slow optical zoom in; the camera itself does not move.</td><td><button class="copy" data-copy="Slow optical zoom in; the camera itself does not move.">복사</button></td></tr><tr><th>랙 포커스</th><td class="mono">Rack focus from the object in front to her face; no camera move.</td><td><button class="copy" data-copy="Rack focus from the object in front to her face; no camera move.">복사</button></td></tr><tr><th>돌리 줌</th><td class="mono">Dolly zoom: move back while zooming in; her face stays the same size.</td><td><button class="copy" data-copy="Dolly zoom: move back while zooming in; her face stays the same size.">복사</button></td></tr></tbody></table></div><h3 class="sub">사이즈 9 · 다른 카드 뒤에 붙여 시작·끝 크기를 정할 때</h3><div class="chips"><button class="chip copy" data-copy="Extreme long shot"><span class="mono">Extreme long shot</span> · 점처럼</button><button class="chip copy" data-copy="Long shot"><span class="mono">Long shot</span> · 화면의 1/3</button><button class="chip copy" data-copy="Full shot"><span class="mono">Full shot</span> · 머리~발</button><button class="chip copy" data-copy="Medium full shot"><span class="mono">Medium full shot</span> · 무릎</button><button class="chip copy" data-copy="Medium shot"><span class="mono">Medium shot</span> · 허리</button><button class="chip copy" data-copy="Medium close-up"><span class="mono">Medium close-up</span> · 가슴</button><button class="chip copy" data-copy="Close-up"><span class="mono">Close-up</span> · 머리와 어깨</button><button class="chip copy" data-copy="Big close-up"><span class="mono">Big close-up</span> · 이마~턱</button><button class="chip copy" data-copy="Extreme close-up"><span class="mono">Extreme close-up</span> · 눈만</button></div><p class="note">예: <span class="mono">Slow dolly in, from a medium shot to a close-up.</span> 사이즈 이름만 쓰기보다 어디서 자르는지(무릎, 허리 등)를 함께 쓰면 정확도가 올라갑니다.</p></section><footer class="foot" id="sources"><h2 class="sec">출처</h2>
+<p><b>내용</b> · AI 아스트라, 「AI 영화 제작 가이드⚡AI 영상 퀄리티 3배 높여주는 8가지 비법 공개」, YouTube, 2026-08-21. <a href="https://www.youtube.com/watch?v=sHs0_iZJxHk" target="_blank" rel="noopener">youtube.com/watch?v=sHs0_iZJxHk</a></p>
+<p><b>예시 이미지·영상</b> · Higgsfield에서 직접 생성 (이미지: Seedream 5 Lite, 영상: Seedance 2.0 Mini 480p).</p>
+<p><b>보충</b> · 기법 분류, 돌리 줌의 반대 방향, 빅 클로즈업 명칭, 관계 샷 설명은 일반적인 촬영 용어 기준으로 다시 정리했습니다. 원본 영상의 분류와 다릅니다.</p>
+<p><b>스스로 확인해 보기</b> · "핸드헬드가 AI 티를 줄인다", "3패널 시트가 중복 인물을 줄인다" 같은 주장은 영상 제작자의 경험에서 나온 것입니다. 직접 실험해서 확인해 보세요.</p>
+</footer></main>
+<button class="top" aria-label="맨 위로">↑</button>
+<script>
+document.querySelectorAll('.copy').forEach(b=>b.addEventListener('click',async()=>{
+  const t=b.dataset.copy;let ok=false;
+  try{await navigator.clipboard.writeText(t);ok=true}catch(e){
+    const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();
+    try{ok=document.execCommand('copy')}catch(_){}a.remove()}
+  if(!b.classList.contains('chip')){const o=b.textContent;b.textContent=ok?'복사됨':'실패';setTimeout(()=>b.textContent=o,1400)}
+  b.classList.add('done');setTimeout(()=>b.classList.remove('done'),1400);
+}));
+document.querySelectorAll('video').forEach(v=>v.addEventListener('play',()=>{
+  document.querySelectorAll('video').forEach(o=>{if(o!==v&&!o.paused)o.pause()})}));
+const links=[...document.querySelectorAll('nav a')],secs=links.map(a=>document.querySelector(a.getAttribute('href')));
+const topBtn=document.querySelector('.top');
+addEventListener('scroll',()=>{let cur=-1;secs.forEach((s,i)=>{if(s&&s.getBoundingClientRect().top<120)cur=i});
+  links.forEach((a,i)=>a.classList.toggle('on',i===cur));topBtn.classList.toggle('show',scrollY>800)},{passive:true});
+topBtn.addEventListener('click',()=>scrollTo({top:0}));
+</script></body></html>
